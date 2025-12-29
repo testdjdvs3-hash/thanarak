@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบเช็คชื่อนักเรียนเข้าเรียน</title>
+    <title>ระบบเช็คชื่อเข้าเรียน</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
@@ -27,8 +28,7 @@
         .dark .summary-row:hover { background-color: #374151; }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 transition-colors duration-300 antialiased">
-
+   <body class="bg-white dark:bg-gray-950 text-gray-800 dark:text-gray-200 transition-colors duration-300">
    <div class="container mx-auto p-4 md:p-6">
         <header class="bg-white dark:bg-gray-900 rounded-xl shadow-lg border-2 border-emerald-600 dark:border-emerald-700 p-4 mb-6 flex flex-col sm:flex-row justify-between items-center gap-4">
              <div class="flex items-center space-x-3">
@@ -58,7 +58,7 @@
                     </button>
                     <a href="YOUR_URL_HERE" target="_blank" rel="noopener noreferrer" 
                         class="flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-emerald-700 dark:text-emerald-200 hover:bg-emerald-200 dark:hover:bg-emerald-700 transition-colors duration-200">
-                        <i data-lucide="external-link" class="w-4 h-4 mr-1.5"></i>เมนนูว่างเปล่ายังไม่ได้ใส่อ่ะไร
+                        <i data-lucide="external-link" class="w-4 h-4 mr-1.5"></i>ยังคิดไม่ออกว่าจะใส่อะไร
                     </a>
                 </nav>
                 <button onclick="toggleTheme()" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-sm p-2.5">
@@ -70,10 +70,9 @@
 
         <main id="main-content">
             <div id="content-dashboard" class="hidden space-y-6">
-                 <div class="bg-white  sm:p-6 rounded-xl shadow-lg border-2 border-pink-500 dark:border-pink-700 text-gray-800 dark:text-white">
-
+                 <div class="bg-white dark:bg-gray-900 sm:p-6 rounded-xl shadow-lg border-2 border-pink-500 dark:border-pink-700 text-gray-900 dark:text-white">
                  <div class="flex flex-col sm:flex-row items-center justify-between mb-4 gap-4">
-                         <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300">ภาพรวมการเข้าเรียน</h2>
+                         <h2 class="text-gray-900 dark:text-white font-bold text-xl">ภาพรวมการเข้าเรียน</h2>
                         <input type="date" id="dashboard-date" class="border rounded-lg p-2 w-full sm:w-auto bg-transparent dark:text-gray-200 dark:border-gray-600">
                     </div>
       
@@ -367,12 +366,12 @@
                                <button onclick="sendReportToLine()" id="send-line-btn" class="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 w-full sm:w-auto flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>
                                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 496 512"><path d="M248,8C111.033,8,0,119.033,0,256S111.033,504,248,504,496,392.967,496,256,384.967,8,248,8ZM362.952,176.66c-3.732,39.215-19.881,134.378-28.1,178.3-3.476,18.584-10.322,24.816-16.948,25.425-14.4,1.326-25.438-9.333-39.687-18.5-21.861-14.108-34.254-23.219-51.353-36.5-25.134-19.524-12.63-29.562,8.874-45.888,58.342-46.182,109.1-87.072,112.554-87.843,1.673-.374,3.582-.6,5.14-.6,1.48,0,2.83,.41,4.032,1.233,1.328,.89,1.94,2.123,2.023,3.383.094,1.468-.6,2.946-1.8,4.432-1.352,1.622-24,21.54-66.27,54.733-16.53,13.01-29.3,23.465-29.745,24.788-.465,1.378-1.042,5.555.884,8.06,2.052,2.695,18.023,17.48,27.5,26.936,9.22,9.186,16.262,16.222,23.32,23.254,12.71,12.72,24.03,6.368,27.78-4.18,11.39-31.9,41.62-136.1,49.28-176.314.93-4.956-.942-9.287-4.15-11.66-3.208-2.373-7.464-2.61-11.129-.75Z"/></svg>
                                     
-                                     <span>ส่งแจ้งเตือน (ขาด/ลา)ยังใช้ไม่ได้</span>
+                                     <span>ส่งแจ้งเตือน (ขาด/ลา)(ยังใช้ไม่ได้)</span>
                                 </button>
                                 <button onclick="sendPresentReportToLine()" id="send-present-line-btn" class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 w-full sm:w-auto flex items-center justify-center gap-2 disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>
                   
                                      <i data-lucide="user-check" class="w-5 h-5"></i>
-                                    <span>ส่งแจ้งเตือน (มาเรียน)ยังใช้ไม่ได้</span>
+                                    <span>ส่งแจ้งเตือน (มาเรียน)(ยังใช้ไม่ได้)</span>
                                 </button>
           
                            </div>
@@ -1656,7 +1655,7 @@
                  alert(`เกิดข้อผิดพลาดรุนแรงในการส่ง LINE: ${err.message}`);
             } finally {
                 btn.disabled = false;
-                btn.querySelector('span').innerText = 'ส่งแจ้งเตือน (ขาด/ลา)ยังใช้ไม่ได้';
+                btn.querySelector('span').innerText = 'ส่งแจ้งเตือน (ขาด/ลา)(ยังใช้ไม่ได้)';
             }
         }
         
@@ -1677,7 +1676,7 @@
                 alert(`เกิดข้อผิดพลาดรุนแรงในการส่ง LINE: ${err.message}`);
             } finally {
                 btn.disabled = false;
-                btn.querySelector('span').innerText = 'ส่งแจ้งเตือน (มาเรียน)ยังใช้ไม่ได้';
+                btn.querySelector('span').innerText = 'ส่งแจ้งเตือน (มาเรียน)(ยังใช้ไม่ได้)';
             }
         }
     
@@ -1918,5 +1917,7 @@
         }
     </script>
 </body>
-
 </html>
+
+
+
