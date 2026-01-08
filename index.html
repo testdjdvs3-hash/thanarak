@@ -589,20 +589,7 @@
                     if (faceMatcher) {
                         resizedDetections.forEach(d => {
                             const bestMatch = faceMatcher.findBestMatch(d.descriptor);
-                            const box = d.detection.box;
-                        // กลับแกน X (เพราะ video ถูก mirror)
-                        const mirroredBox = new faceapi.Box(
-                            overlay.width - box.x - box.width,
-                                box.y,
-                                box.width,
-                                box.height
-                                );
-                                
-                                new faceapi.draw.DrawBox(mirroredBox, {
-                                    label: bestMatch.toString()
-                                }).draw(overlay);
-
-                            
+                            new faceapi.draw.DrawBox(d.detection.box, { label: bestMatch.toString() }).draw(overlay);
                             if (bestMatch.label !== 'unknown') {
                                 const student = students.find(s => s.name === bestMatch.label);
                                 if (student && !checkedInToday.has(String(student.id))) {
@@ -1930,6 +1917,7 @@
     </script>
 </body>
 </html>
+
 
 
 
