@@ -1205,17 +1205,18 @@
             }
             
             const constraints = { video: { deviceId: { exact: selectedDeviceId } } };
-            
-            // Mirroring logic
-            const selectedDevice = videoDevices.find(d => d.deviceId === selectedDeviceId);
-            const isRearCamera = selectedDevice?.label.toLowerCase().includes('back');
-            if (isRearCamera) {
-                video.style.transform = "scaleX(1)";
-                overlay.style.transform = "scaleX(1)";
-            } else {
-                video.style.transform = "scaleX(-1)";
-                overlay.style.transform = "scaleX(1)";
-            }
+
+                const selectedDevice = videoDevices.find(d => d.deviceId === selectedDeviceId);
+                const isRearCamera = selectedDevice?.label.toLowerCase().includes('back');
+                
+                if (isRearCamera) {
+                    video.style.transform = "scaleX(1)";
+                    overlay.style.transform = "scaleX(1)";
+                } else {
+                    video.style.transform = "scaleX(-1)";
+                    overlay.style.transform = "scaleX(1)"; // ❗ สำคัญ
+                }
+
 
             // New stream logic
             navigator.mediaDevices.getUserMedia(constraints)
@@ -1917,6 +1918,7 @@
     </script>
 </body>
 </html>
+
 
 
 
