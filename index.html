@@ -1375,12 +1375,29 @@
         async function handleStudentFormSubmit(event) {
             event.preventDefault();
             const submitBtn = document.getElementById('form-submit-btn');
-            submitBtn.disabled = true; submitBtn.innerText = 'กำลังบันทึก...';
-            const studentData = { rowIndex: document.getElementById('student-row-index').value, id: document.getElementById('student-id').value, name: document.getElementById('student-name').value, class: document.getElementById('student-class').value, imageData: document.getElementById('student-image-data').value };
-            if (!studentData.imageData && !studentData.rowIndex) { 
-                alert('กรุณาอัปโหลดรูปภาพสำหรับนักเรียนใหม่');
-                submitBtn.disabled = false; submitBtn.innerText = 'บันทึก'; return;
+            submitBtn.disabled = true; 
+            submitBtn.innerText = 'กำลังบันทึก...';
+
+            // ดึงค่าจากช่อง input ทั้ง 3 รูปตามแผนใหม่
+            const studentData = { 
+                rowIndex: document.getElementById('student-row-index').value, 
+                id: document.getElementById('student-id').value, 
+                name: document.getElementById('student-name').value, 
+                class: document.getElementById('student-class').value, 
+                // เปลี่ยนจาก imageData เป็นการส่ง 3 รูปแยกกัน
+                image1: document.getElementById('student-image-data-1').value, 
+                image2: document.getElementById('student-image-data-2').value,
+                image3: document.getElementById('student-image-data-3').value
+            };
+
+            // ตรวจสอบว่ามีรูปอย่างน้อย 1 รูป หากเป็นนักเรียนใหม่
+            if (!studentData.image1 && !studentData.rowIndex) { 
+                alert('กรุณาอัปโหลดรูปภาพอย่างน้อย 1 รูปสำหรับนักเรียนใหม่');
+                submitBtn.disabled = false; 
+                submitBtn.innerText = 'บันทึก'; 
+                return;
             }
+
             const action = studentData.rowIndex ? 'updateStudent' : 'addStudent';
             
             try {
@@ -1401,6 +1418,7 @@
                 submitBtn.innerText = 'บันทึก';
             }
         }
+
         async function deleteStudent(rowIndex) {
             if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนักเรียนคนนี้?')) {
                 try {
@@ -1918,6 +1936,7 @@
     </script>
 </body>
 </html>
+
 
 
 
