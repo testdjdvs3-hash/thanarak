@@ -528,7 +528,8 @@
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 md:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar">
             <h2 id="modal-title-subject" class="text-2xl font-bold mb-6">เพิ่มข้อมูลรายวิชา</h2>
             <form id="subject-form" onsubmit="handleSubjectFormSubmit(event)">
-                <input type="hidden" id="subject-row-index">
+                <input type="hidden" id="subject-row-index"><
+        
       
                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -1921,6 +1922,7 @@ function openStudentModal(student = null) {
             const dataToExport = summaryReportData.summary.map(item => {
                 const totalAttendance = item.present + item.absent + item.leave;
                 const attendancePercent = totalAttendance > 0 ? ((item.present / totalAttendance) * 100).toFixed(2) : "0.00";
+                
                 return {
  
                     'ชั้น': item.class,
@@ -2120,9 +2122,24 @@ async function deleteStudent(id, rowIndex) {
         alert('เกิดข้อผิดพลาด: ' + err.message);
     }
 }
+        document.getElementById('image-upload-input-subject').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const base64String = event.target.result;
+                // 1. โชว์รูปตัวอย่างในหน้าจอ
+                document.getElementById('image-preview-subject').src = base64String;
+                // 2. เก็บค่ารหัสรูปไว้ในช่องลับที่ครูเพิ่งสร้าง
+                document.getElementById('subject-image-data').value = base64String;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
     </script>
 </body>
 </html>
+
 
 
 
