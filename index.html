@@ -1448,34 +1448,31 @@
                 renderStudentTableForStudentsPage();
             }
         }
-       async function handleStudentFormSubmit(event) {
+      async function handleStudentFormSubmit(event) {
     event.preventDefault();
     
-    // ดึงค่ารหัสแถวมาตรวจสอบว่าเป็น "เพิ่มใหม่" หรือ "แก้ไข"
     const rowIndex = document.getElementById('student-row-index').value;
-    const action = rowIndex ? 'updateStudent' : 'addStudent';
-
-    // *** จุดสำคัญ: ต้องดึงค่าจาก id="imagedatabase64" มาใส่ใน imageData ***
+    
+    // ดึงค่ารูปภาพจากทั้ง 3 ช่อง Hidden Input
     const studentData = {
         id: document.getElementById('student-id').value,
         name: document.getElementById('student-name').value,
         class: document.getElementById('student-class').value,
-        // ดึงค่ารูปภาพที่ฟังก์ชัน handleImageUpload เก็บไว้มาส่งต่อ
-        imageData: document.getElementById('imagedatabase64').value 
+        imageData: document.getElementById('imagedatabase64').value, // รูปที่ 1
+        imageData2: document.getElementById('imagedatabase64-2').value, // รูปที่ 2
+        imageData3: document.getElementById('imagedatabase64-3').value  // รูปที่ 3
     };
 
     try {
         const response = await apiCall({
-            action: action,
+            action: rowIndex ? 'updateStudent' : 'addStudent',
             data: rowIndex ? { ...studentData, rowIndex: rowIndex } : studentData
         });
 
         if (response.success) {
-            alert('บันทึกข้อมูลเรียบร้อยแล้ว');
+            alert('บันทึกข้อมูลและรูปภาพทั้งหมดสำเร็จ');
             closeStudentModal();
-            await loadStudentDataForStudentsPage(); // รีเฟรชตาราง
-        } else {
-            alert('บันทึกไม่สำเร็จ: ' + response.error);
+            await loadStudentDataForStudentsPage();
         }
     } catch (err) {
         alert('เกิดข้อผิดพลาด: ' + err.message);
@@ -2113,6 +2110,7 @@ async function deleteStudent(id, rowIndex) {
     </script>
 </body>
 </html>
+
 
 
 
