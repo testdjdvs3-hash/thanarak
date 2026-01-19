@@ -483,8 +483,47 @@
         </main>
     </div>
 
-    <div id="student-modal" class="fixed inset-0 bg-gray-800 bg-opacity-70 flex items-center justify-center p-4 z-40 hidden"><div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 md:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar"><h2 id="modal-title" class="text-2xl font-bold mb-6">เพิ่มข้อมูลนักเรียน</h2><form id="student-form" onsubmit="handleStudentFormSubmit(event)"><input type="hidden" id="student-row-index"><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div><label for="student-id" class="block font-medium mb-2">รหัสนักเรียน</label><input type="text" id="student-id" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg p-3" required><label for="student-name" class="block font-medium mb-2 mt-4">ชื่อ-สกุล</label><input type="text" id="student-name" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg p-3" required><label for="student-class" class="block font-medium mb-2 mt-4">ชั้นเรียน</label><input type="text" id="student-class" class="w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded-lg p-3" required></div><div class="flex flex-col"><label class="block font-medium mb-2">รูปภาพนักเรียน</label><div id="input-upload" class="flex flex-col items-center"><div class="w-full max-w-xs mx-auto aspect-[4/3] bg-gray-200 dark:bg-gray-700 rounded-lg flex items-center justify-center overflow-hidden"><img id="image-preview" src="https://placehold.co/400x300/e2e8f0/475569?text=Image" class="w-full h-full object-cover"></div><input type="file" id="image-upload-input" accept="image/*" class="hidden"><button type="button" onclick="document.getElementById('image-upload-input').click()" class="bg-indigo-600 text-white px-4 py-2 mt-4 rounded-lg hover:bg-indigo-700 w-full max-w-xs">เลือกไฟล์รูปภาพ</button></div></div></div><input type="hidden" id="student-image-data"><div class="flex justify-end space-x-4 mt-8"><button type="button" onclick="closeStudentModal()" class="bg-gray-200 text-gray-700 dark:bg-gray-600 dark:text-gray-300 px-6 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500">ยกเลิก</button><button type="submit" id="form-submit-btn" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">บันทึก</button></div></form></div></div>
-
+    <div id="student-modal" class="fixed inset-0 bg-gray-800 bg-opacity-70 flex items-center justify-center p-4 z-40 hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 md:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <h2 id="student-modal-title" class="text-2xl font-bold mb-6">จัดการข้อมูลนักเรียน</h2>
+        <form id="student-form" onsubmit="handleStudentFormSubmit(event)">
+            <input type="hidden" id="student-row-index">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block mb-1">รหัสนักเรียน</label>
+                    <input type="text" id="student-id" class="w-full border rounded p-2 mb-3" required>
+                    <label class="block mb-1">ชื่อ-สกุล</label>
+                    <input type="text" id="student-name" class="w-full border rounded p-2 mb-3" required>
+                    <label class="block mb-1">ชั้นเรียน</label>
+                    <input type="text" id="student-class" class="w-full border rounded p-2" required>
+                </div>
+                <div>
+                    <div class="grid grid-cols-3 gap-2 mb-4">
+                        <img id="image-preview-1" src="https://via.placeholder.com/150" class="w-full h-24 object-cover border">
+                        <img id="image-preview-2" src="https://via.placeholder.com/150" class="w-full h-24 object-cover border">
+                        <img id="image-preview-3" src="https://via.placeholder.com/150" class="w-full h-24 object-cover border">
+                    </div>
+                    <div class="space-y-2">
+                        <button type="button" onclick="document.getElementById('upload-1').click()" class="bg-indigo-600 text-white py-1 px-2 rounded text-xs w-full">รูป 1 (หลัก)</button>
+                        <button type="button" onclick="document.getElementById('upload-2').click()" class="bg-indigo-600 text-white py-1 px-2 rounded text-xs w-full">รูป 2</button>
+                        <button type="button" onclick="document.getElementById('upload-3').click()" class="bg-indigo-600 text-white py-1 px-2 rounded text-xs w-full">รูป 3</button>
+                    </div>
+                    <input type="file" id="upload-1" class="hidden" onchange="handleImageUpload(event, 1)">
+                    <input type="file" id="upload-2" class="hidden" onchange="handleImageUpload(event, 2)">
+                    <input type="file" id="upload-3" class="hidden" onchange="handleImageUpload(event, 3)">
+                    
+                    <input type="hidden" id="imagedatabase64"> 
+                    <input type="hidden" id="imagedatabase64-2">
+                    <input type="hidden" id="imagedatabase64-3">
+                </div>
+            </div>
+            <div class="flex justify-end space-x-3 mt-6">
+                <button type="button" onclick="closeStudentModal()" class="bg-gray-500 text-white px-4 py-2 rounded">ยกเลิก</button>
+                <button type="submit" id="form-submit-btn" class="bg-blue-600 text-white px-4 py-2 rounded">บันทึก</button>
+            </div>
+        </form>
+    </div>
+</div>
     <div id="subject-modal" class="fixed inset-0 bg-gray-800 bg-opacity-70 flex items-center justify-center p-4 z-40 hidden">
         <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl p-6 md:p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar">
             <h2 id="modal-title-subject" class="text-2xl font-bold mb-6">เพิ่มข้อมูลรายวิชา</h2>
@@ -1265,44 +1304,82 @@
         }
         
         // --- STUDENT & SUBJECT MANAGEMENT ---
-        function handleImageUpload(event, previewId, dataId) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = e => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas'), MAX_WIDTH = 500;
-                    const scaleSize = MAX_WIDTH / img.width;
-                    canvas.width = MAX_WIDTH; canvas.height = img.height * scaleSize;
-                    canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const dataUrl = canvas.toDataURL('image/jpeg');
-                    document.getElementById(previewId).src = dataUrl;
-                    document.getElementById(dataId).value = dataUrl;
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+        async function handleImageUpload(event, index) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // แสดงสถานะว่ากำลังโหลด (ถ้าต้องการ)
+    const previewImg = document.getElementById(`image-preview-${index}`);
+    if (previewImg) previewImg.style.opacity = '0.5';
+
+    try {
+        // ใช้ฟังก์ชัน resizeImage ตัวเดิมของคุณเพื่อย่อขนาด (ป้องกันการค้างตอนบันทึก)
+        const base64 = await resizeImage(file); 
+        
+        // แสดงรูปพรีวิวให้ตรงช่อง
+        if (previewImg) {
+            previewImg.src = base64;
+            previewImg.style.opacity = '1';
         }
+        
+        // เก็บค่า Base64 ลงในช่อง Input ลับ
+        const hiddenId = (index === 1) ? 'imagedatabase64' : `imagedatabase64-${index}`;
+        const hiddenInput = document.getElementById(hiddenId);
+        if (hiddenInput) hiddenInput.value = base64;
+
+    } catch (err) {
+        console.error("Error uploading image:", err);
+        alert("เกิดข้อผิดพลาดในการประมวลผลรูปภาพ");
+    }
+}
     
         function openStudentModal(student = null) {
-            document.getElementById('student-form').reset();
-            document.getElementById('image-preview').src = 'https://placehold.co/400x300/e2e8f0/475569?text=Image';
-            document.getElementById('student-image-data').value = '';
+    // 1. ล้างข้อมูลในฟอร์มทุกครั้งที่เปิด
+    const form = document.getElementById('student-form');
+    if (form) form.reset();
+
+    // 2. ตรวจสอบและตั้งค่า ID แถว (Row Index)
+    const rowIndexInput = document.getElementById('student-row-index');
+    if (rowIndexInput) rowIndexInput.value = student ? student.rowIndex : '';
+
+    // 3. จัดการหัวข้อและข้อมูลภายใน
+    const modalTitle = document.getElementById('student-modal-title');
     
-            if (student) {
-                document.getElementById('modal-title').innerText = 'แก้ไขข้อมูลนักเรียน';
-                document.getElementById('student-row-index').value = student.rowIndex;
-                document.getElementById('student-id').value = student.id;
-                document.getElementById('student-name').value = student.name;
-                document.getElementById('student-class').value = student.class;
-                document.getElementById('student-image-data').value = student.imagedatabase64 || '';
-                if (student.imagedatabase64) document.getElementById('image-preview').src = student.imagedatabase64;
-            } else {
-                document.getElementById('modal-title').innerText = 'เพิ่มข้อมูลนักเรียน';
-            }
-            document.getElementById('student-modal').classList.remove('hidden');
+    if (student) {
+        if (modalTitle) modalTitle.innerText = 'แก้ไขข้อมูลนักเรียน';
+        document.getElementById('student-id').value = student.id || '';
+        document.getElementById('student-name').value = student.name || '';
+        document.getElementById('student-class').value = student.class || '';
+
+        // ดึงรูปเดิมมาแสดง (รูปที่ 1 ใช้ชื่อ imagedatabase64 ตามที่คุณต้องการ)
+        document.getElementById('image-preview-1').src = student.imagedatabase64 || 'https://via.placeholder.com/150';
+        document.getElementById('imagedatabase64').value = student.imagedatabase64 || '';
+        
+        // รูปที่ 2 และ 3
+        document.getElementById('image-preview-2').src = student.imagedatabase64_2 || 'https://via.placeholder.com/150';
+        document.getElementById('imagedatabase64-2').value = student.imagedatabase64_2 || '';
+        
+        document.getElementById('image-preview-3').src = student.imagedatabase64_3 || 'https://via.placeholder.com/150';
+        document.getElementById('imagedatabase64-3').value = student.imagedatabase64_3 || '';
+    } else {
+        if (modalTitle) modalTitle.innerText = 'เพิ่มนักเรียนใหม่';
+        // ล้างรูปพรีวิวให้เป็นรูปว่าง
+        for (let i = 1; i <= 3; i++) {
+            document.getElementById(`image-preview-${i}`).src = 'https://via.placeholder.com/150';
+            const hiddenId = (i === 1) ? 'imagedatabase64' : `imagedatabase64-${i}`;
+            const hiddenInput = document.getElementById(hiddenId);
+            if (hiddenInput) hiddenInput.value = '';
         }
+    }
+
+    // 4. แสดง Modal (จุดสำคัญที่ทำให้หน้าต่างเด้งขึ้นมา)
+    const modal = document.getElementById('student-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    } else {
+        console.error("หา ID student-modal ไม่เจอใน HTML");
+    }
+}
         function closeStudentModal() { 
             document.getElementById('student-modal').classList.add('hidden');
         }
@@ -1373,34 +1450,41 @@
             }
         }
         async function handleStudentFormSubmit(event) {
-            event.preventDefault();
-            const submitBtn = document.getElementById('form-submit-btn');
-            submitBtn.disabled = true; submitBtn.innerText = 'กำลังบันทึก...';
-            const studentData = { rowIndex: document.getElementById('student-row-index').value, id: document.getElementById('student-id').value, name: document.getElementById('student-name').value, class: document.getElementById('student-class').value, imageData: document.getElementById('student-image-data').value };
-            if (!studentData.imageData && !studentData.rowIndex) { 
-                alert('กรุณาอัปโหลดรูปภาพสำหรับนักเรียนใหม่');
-                submitBtn.disabled = false; submitBtn.innerText = 'บันทึก'; return;
-            }
-            const action = studentData.rowIndex ? 'updateStudent' : 'addStudent';
-            
-            try {
-                const response = await apiCall({ action: action, data: studentData });
-                if (response.success) { 
-                    closeStudentModal();
-                    if (activeTab === 'students') {
-                        await loadStudentData(true);
-                        renderStudentTableForStudentsPage();
-                    }
-                } else { 
-                    alert('Error: ' + (response.error || 'Unknown error'));
-                }
-            } catch (err) {
-                 alert('Error: ' + err.message);
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = 'บันทึก';
-            }
+    event.preventDefault();
+    const submitBtn = document.getElementById('form-submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.innerText = 'กำลังบันทึก...';
+
+    const studentData = {
+        rowIndex: document.getElementById('student-row-index').value,
+        id: document.getElementById('student-id').value,
+        name: document.getElementById('student-name').value,
+        class: document.getElementById('student-class').value,
+        // ดึงค่าจาก ID ใหม่ที่เราตั้งไว้ใน HTML
+        imagedatabase64: document.getElementById('imagedatabase64').value,
+        imagedatabase64_2: document.getElementById('imagedatabase64-2').value,
+        imagedatabase64_3: document.getElementById('imagedatabase64-3').value
+    };
+
+    try {
+        const action = studentData.rowIndex ? 'updateStudent' : 'addStudent';
+        const response = await apiCall({ action: action, data: studentData });
+
+        if (response.success) {
+            closeStudentModal();
+            // รีโหลดข้อมูลตารางใหม่
+            await loadStudentDataForStudentsPage(); 
+        } else {
+            alert('เกิดข้อผิดพลาด: ' + response.error);
         }
+    } catch (err) {
+        console.error('Submit error:', err);
+        alert('บันทึกไม่สำเร็จ: ' + err.message);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'บันทึก';
+    }
+}
         async function deleteStudent(rowIndex) {
             if (confirm('คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนักเรียนคนนี้?')) {
                 try {
@@ -1918,6 +2002,7 @@
     </script>
 </body>
 </html>
+
 
 
 
