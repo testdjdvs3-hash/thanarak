@@ -1448,40 +1448,37 @@
                 renderStudentTableForStudentsPage();
             }
         }
-        async function handleStudentFormSubmit(event) {
+       async function handleStudentFormSubmit(event) {
     event.preventDefault();
-    const submitBtn = document.getElementById('form-submit-btn');
-    submitBtn.disabled = true;
-    submitBtn.innerText = 'กำลังบันทึก...';
+    
+    // ดึงค่ารหัสแถวมาตรวจสอบว่าเป็น "เพิ่มใหม่" หรือ "แก้ไข"
+    const rowIndex = document.getElementById('student-row-index').value;
+    const action = rowIndex ? 'updateStudent' : 'addStudent';
 
+    // *** จุดสำคัญ: ต้องดึงค่าจาก id="imagedatabase64" มาใส่ใน imageData ***
     const studentData = {
-        rowIndex: document.getElementById('student-row-index').value,
         id: document.getElementById('student-id').value,
         name: document.getElementById('student-name').value,
         class: document.getElementById('student-class').value,
-        // ดึงค่าจาก ID ใหม่ที่เราตั้งไว้ใน HTML
-        imagedatabase64: document.getElementById('imagedatabase64').value,
-        imagedatabase64_2: document.getElementById('imagedatabase64-2').value,
-        imagedatabase64_3: document.getElementById('imagedatabase64-3').value
+        // ดึงค่ารูปภาพที่ฟังก์ชัน handleImageUpload เก็บไว้มาส่งต่อ
+        imageData: document.getElementById('imagedatabase64').value 
     };
 
     try {
-        const action = studentData.rowIndex ? 'updateStudent' : 'addStudent';
-        const response = await apiCall({ action: action, data: studentData });
+        const response = await apiCall({
+            action: action,
+            data: rowIndex ? { ...studentData, rowIndex: rowIndex } : studentData
+        });
 
         if (response.success) {
+            alert('บันทึกข้อมูลเรียบร้อยแล้ว');
             closeStudentModal();
-            // รีโหลดข้อมูลตารางใหม่
-            await loadStudentDataForStudentsPage(); 
+            await loadStudentDataForStudentsPage(); // รีเฟรชตาราง
         } else {
-            alert('เกิดข้อผิดพลาด: ' + response.error);
+            alert('บันทึกไม่สำเร็จ: ' + response.error);
         }
     } catch (err) {
-        console.error('Submit error:', err);
-        alert('บันทึกไม่สำเร็จ: ' + err.message);
-    } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = 'บันทึก';
+        alert('เกิดข้อผิดพลาด: ' + err.message);
     }
 }
         async function deleteStudent(rowIndex) {
@@ -2116,6 +2113,7 @@ async function deleteStudent(id, rowIndex) {
     </script>
 </body>
 </html>
+
 
 
 
