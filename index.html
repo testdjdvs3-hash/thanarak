@@ -1304,32 +1304,31 @@
         }
         
         // --- STUDENT & SUBJECT MANAGEMENT ---
-        async function handleImageUpload(event, index) {
+   async function handleImageUpload(event, index) {
     const file = event.target.files[0];
     if (!file) return;
 
-    // แสดงสถานะว่ากำลังโหลด (ถ้าต้องการ)
-    const previewImg = document.getElementById(`image-preview-${index}`);
-    if (previewImg) previewImg.style.opacity = '0.5';
-
     try {
-        // ใช้ฟังก์ชัน resizeImage ตัวเดิมของคุณเพื่อย่อขนาด (ป้องกันการค้างตอนบันทึก)
+        // 1. เรียกใช้ฟังก์ชันย่อรูป (ถ้าไม่มีบรรทัดนี้ หรือไม่มีฟังก์ชัน resizeImage ระบบจะแจ้ง error ทันที)
         const base64 = await resizeImage(file); 
         
-        // แสดงรูปพรีวิวให้ตรงช่อง
+        // 2. แสดงรูปพรีวิวให้ตรงช่อง (image-preview-1, 2, 3)
+        const previewImg = document.getElementById(`image-preview-${index}`);
         if (previewImg) {
             previewImg.src = base64;
-            previewImg.style.opacity = '1';
         }
         
-        // เก็บค่า Base64 ลงในช่อง Input ลับ
-        const hiddenId = (index === 1) ? 'imagedatabase64' : `imagedatabase64-${index}`;
+        // 3. เก็บค่าลงในช่อง Hidden ตาม ID ที่คุณครูตั้งไว้ใน HTML
+        // รูปที่ 1 ใช้ 'imagedatabase64' | รูปที่ 2 และ 3 ใช้ 'imagedatabase64-2' และ 'imagedatabase64-3'
+        let hiddenId = (index === 1) ? 'imagedatabase64' : `imagedatabase64-${index}`;
         const hiddenInput = document.getElementById(hiddenId);
-        if (hiddenInput) hiddenInput.value = base64;
-
+        
+        if (hiddenInput) {
+            hiddenInput.value = base64;
+        }
     } catch (err) {
-        console.error("Error uploading image:", err);
-        alert("เกิดข้อผิดพลาดในการประมวลผลรูปภาพ");
+        console.error("Error:", err);
+        alert("เกิดข้อผิดพลาดในการประมวลผลรูปภาพ"); // ข้อความแจ้งเตือนที่คุณครูเจอ
     }
 }
     
@@ -1393,45 +1392,34 @@
                  students = [];
                  renderStudentTableForStudentsPage();
             }
-        }
-    
-        function renderStudentTableForStudentsPage() {
-            const tableBody = document.getElementById('students-page-table-body');
-            tableBody.innerHTML = '';
-            if (students.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-gray-500">ยังไม่มีข้อมูลนักเรียน</td></tr>';
-                return;
-            }
-            students.forEach(student => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="p-2"><img src="${student.imagedatabase64 || 'https://placehold.co/40x40/e2e8f0/475569?text=?'}" class="w-10 h-10 rounded-full object-cover"></td>
-                    
- 
-                     <td class="p-3">${student.id}</td>
-                    <td class="p-3">${student.name}</td>
-                    <td class="p-3">${student.class}</td>
-                    <td class="p-3 text-center"></td>`;
-             
-                 const actionsCell = row.cells[4];
-                const editButton = document.createElement('button');
-                editButton.className = 'text-blue-600 p-1 hover:underline';
-                editButton.innerHTML = `<i data-lucide="edit" class="inline-block w-4 h-4 mr-1"></i>แก้ไข`;
-              
-                 editButton.onclick = () => openStudentModal(student);
+           function resizeImage(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                // ปรับขนาดความกว้างเหลือ 400px เพื่อความรวดเร็วในการบันทึก
+                const maxWidth = 400; 
+                const scaleSize = maxWidth / img.width;
+                canvas.width = maxWidth;
+                canvas.height = img.height * scaleSize;
+
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
                 
- 
-                   const deleteButton = document.createElement('button');
-                deleteButton.className = 'text-red-600 p-1 ml-2 hover:underline';
-                deleteButton.innerHTML = `<i data-lucide="trash-2" class="inline-block w-4 h-4 mr-1"></i>ลบ`;
-                deleteButton.onclick = () => deleteStudent(student.rowIndex);
-    
-                actionsCell.appendChild(editButton);
-                actionsCell.appendChild(deleteButton);
-                tableBody.appendChild(row);
-            });
-            lucide.createIcons();
+                // ส่งค่ารูปภาพที่บีบอัดแล้วกลับไป
+                resolve(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = e.target.result;
+        };
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+    });
+}
         }
+    
+        
 
         function sortStudentTable(isStudentsPage = false) {
             studentSortOrder = studentSortOrder === 'asc' ? 'desc' : 'asc';
@@ -1999,9 +1987,125 @@
                 );
             }
         }
+        function resizeImage(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                // ย่อขนาดเหลือ 400px เพื่อให้บันทึกไว ไม่ค้าง
+                const maxWidth = 400; 
+                const scaleSize = maxWidth / img.width;
+                canvas.width = maxWidth;
+                canvas.height = img.height * scaleSize;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                // แปลงรูปเป็นรหัส Base64 คุณภาพ 0.7
+                resolve(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = e.target.result;
+        };
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+    });
+}
+        // ... โค้ดอื่นๆ ของคุณครู ...
+
+// --- วางฟังก์ชันแสดงตารางไว้ตรงนี้ (ห้ามอยู่ในปีกกาของใคร) ---
+function renderStudentTableForStudentsPage() {
+    const tableBody = document.getElementById('students-page-table-body');
+    if (!tableBody) return; 
+    
+    tableBody.innerHTML = '';
+    
+    if (students.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5" class="text-center p-4 text-gray-500">ยังไม่มีข้อมูลนักเรียน</td></tr>';
+        return;
+    }
+
+    students.forEach(student => {
+        const row = document.createElement('tr');
+        row.className = "border-b dark:border-gray-700"; 
+        row.innerHTML = `
+            <td class="p-2 text-center">
+                <img src="${student.imagedatabase64 || 'https://via.placeholder.com/40'}" 
+                     class="w-10 h-10 rounded-full object-cover mx-auto border dark:border-gray-600">
+            </td>
+            <td class="p-3 text-center">${student.id}</td>
+            <td class="p-3">${student.name}</td>
+            <td class="p-3 text-center">${student.class}</td>
+            <td class="p-3 text-center space-x-2">
+                <button onclick='openStudentModal(${JSON.stringify(student)})' 
+                        class="text-blue-600 hover:text-blue-800 dark:text-blue-400 font-medium">
+                    <i class="fas fa-edit"></i> แก้ไข
+                </button>
+                <span class="text-gray-300">|</span>
+                <button onclick="deleteStudent('${student.id}', ${student.rowIndex})" 
+                        class="text-red-600 hover:text-red-800 dark:text-red-400 font-medium">
+                    <i class="fas fa-trash"></i> ลบ
+                </button>
+            </td>
+        `;
+        tableBody.appendChild(row);
+    });
+}
+// --- วางฟังก์ชันย่อรูปไว้ล่างสุด ---
+function resizeImage(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const maxWidth = 400; 
+                const scaleSize = maxWidth / img.width;
+                canvas.width = maxWidth;
+                canvas.height = img.height * scaleSize;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = e.target.result;
+        };
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+    });
+}
+
+// ปิดท้ายด้วยปีกกาหรือคำสั่งสุดท้ายก่อนปิด tag script
+async function deleteStudent(id, rowIndex) {
+    // 1. ตรวจสอบว่ามี rowIndex มาไหม
+    if (!rowIndex) {
+        alert("ไม่พบตำแหน่งแถวที่จะลบ กรุณารีเฟรชหน้าเว็บแล้วลองใหม่");
+        return;
+    }
+
+    if (!confirm(`คุณต้องการลบข้อมูลนักเรียนรหัส ${id} ใช่หรือไม่?`)) return;
+
+    try {
+        // 2. ส่งข้อมูลไปที่ GAS โดยห่อไว้ในตัวแปร data
+        const response = await apiCall({ 
+            action: 'deleteStudent', 
+            data: { rowIndex: rowIndex } 
+        });
+
+        if (response.success) {
+            alert('ลบข้อมูลเรียบร้อยแล้ว');
+            // 3. โหลดข้อมูลใหม่เพื่อให้ rowIndex ของคนอื่นๆ อัปเดตตามจริง
+            await loadStudentDataForStudentsPage(); 
+        } else {
+            alert('ลบไม่สำเร็จ: ' + response.error);
+        }
+    } catch (err) {
+        console.error("Delete Error:", err);
+        alert('เกิดข้อผิดพลาด: ' + err.message);
+    }
+}
     </script>
 </body>
 </html>
+
 
 
 
