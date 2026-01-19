@@ -1309,26 +1309,37 @@
     if (!file) return;
 
     try {
-        // 1. เรียกใช้ฟังก์ชันย่อรูป (ถ้าไม่มีบรรทัดนี้ หรือไม่มีฟังก์ชัน resizeImage ระบบจะแจ้ง error ทันที)
+        // 1. ตรวจสอบว่ามีฟังก์ชัน resizeImage อยู่จริงหรือไม่ก่อนเรียกใช้
+        if (typeof resizeImage !== 'function') {
+            throw new Error("ไม่พบฟังก์ชัน resizeImage กรุณาตรวจสอบการวางโค้ด");
+        }
+
         const base64 = await resizeImage(file); 
         
-        // 2. แสดงรูปพรีวิวให้ตรงช่อง (image-preview-1, 2, 3)
-        const previewImg = document.getElementById(`image-preview-${index}`);
+        // 2. แสดงรูปพรีวิว (ตรวจสอบ ID ให้แน่ใจว่าตรงกับใน HTML)
+        const previewId = `image-preview-${index}`;
+        const previewImg = document.getElementById(previewId);
+        
         if (previewImg) {
             previewImg.src = base64;
+        } else {
+            console.warn(`ไม่พบ element ID: ${previewId} สำหรับแสดงรูปพรีวิว`);
         }
         
-        // 3. เก็บค่าลงในช่อง Hidden ตาม ID ที่คุณครูตั้งไว้ใน HTML
-        // รูปที่ 1 ใช้ 'imagedatabase64' | รูปที่ 2 และ 3 ใช้ 'imagedatabase64-2' และ 'imagedatabase64-3'
-        let hiddenId = (index === 1) ? 'imagedatabase64' : `imagedatabase64-${index}`;
+        // 3. เก็บค่าลงช่อง Hidden (อิงตาม ID ในรูป image_b49d48.png)
+        // รูป 1 = imagedatabase64 | รูป 2 = imagedatabase64-2 | รูป 3 = imagedatabase64-3
+        let hiddenId = (parseInt(index) === 1) ? 'imagedatabase64' : `imagedatabase64-${index}`;
         const hiddenInput = document.getElementById(hiddenId);
         
         if (hiddenInput) {
             hiddenInput.value = base64;
+        } else {
+            console.error(`ไม่พบ input ID: ${hiddenId} สำหรับเก็บข้อมูลรูปภาพ`);
         }
+
     } catch (err) {
-        console.error("Error:", err);
-        alert("เกิดข้อผิดพลาดในการประมวลผลรูปภาพ"); // ข้อความแจ้งเตือนที่คุณครูเจอ
+        console.error("Image Upload Error:", err);
+        alert("เกิดข้อผิดพลาดในการประมวลผลรูปภาพ: " + (err.message || ""));
     }
 }
     
@@ -2105,6 +2116,7 @@ async function deleteStudent(id, rowIndex) {
     </script>
 </body>
 </html>
+
 
 
 
