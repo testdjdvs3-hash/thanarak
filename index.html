@@ -1343,51 +1343,64 @@
     }
 }
     
-        function openStudentModal(student = null) {
-    // 1. ล้างข้อมูลในฟอร์มทุกครั้งที่เปิด
+function openStudentModal(student = null) {
+    // 1. ล้างข้อมูลในฟอร์ม
     const form = document.getElementById('student-form');
     if (form) form.reset();
 
-    // 2. ตรวจสอบและตั้งค่า ID แถว (Row Index)
+    // 2. ตั้งค่า rowIndex (ID แถว)
     const rowIndexInput = document.getElementById('student-row-index');
-    if (rowIndexInput) rowIndexInput.value = student ? student.rowIndex : '';
+    if (rowIndexInput) rowIndexInput.value = student ? (student.rowIndex || '') : '';
 
-    // 3. จัดการหัวข้อและข้อมูลภายใน
     const modalTitle = document.getElementById('student-modal-title');
     
     if (student) {
+        // --- โหมดแก้ไข ---
         if (modalTitle) modalTitle.innerText = 'แก้ไขข้อมูลนักเรียน';
+        
+        // ใส่ข้อมูลพื้นฐาน (เช็กทั้ง student.class และ student.studentClass)
         document.getElementById('student-id').value = student.id || '';
         document.getElementById('student-name').value = student.name || '';
-        document.getElementById('student-class').value = student.class || '';
+        document.getElementById('student-class').value = student.class || student.studentClass || '';
 
-        // ดึงรูปเดิมมาแสดง (รูปที่ 1 ใช้ชื่อ imagedatabase64 ตามที่คุณต้องการ)
-        document.getElementById('image-preview-1').src = student.imagedatabase64 || 'https://via.placeholder.com/150';
-        document.getElementById('imagedatabase64').value = student.imagedatabase64 || '';
-        
-        // รูปที่ 2 และ 3
-        document.getElementById('image-preview-2').src = student.imagedatabase64_2 || 'https://via.placeholder.com/150';
-        document.getElementById('imagedatabase64-2').value = student.imagedatabase64_2 || '';
-        
-        document.getElementById('image-preview-3').src = student.imagedatabase64_3 || 'https://via.placeholder.com/150';
-        document.getElementById('imagedatabase64-3').value = student.imagedatabase64_3 || '';
+        // จัดการรูปภาพทั้ง 3 รูป
+        const images = [
+            { preview: 'image-preview-1', hidden: 'imagedatabase64', data: student.imagedatabase64 },
+            { preview: 'image-preview-2', hidden: 'imagedatabase64-2', data: student.imagedatabase64_2 },
+            { preview: 'image-preview-3', hidden: 'imagedatabase64-3', data: student.imagedatabase64_3 }
+        ];
+
+        images.forEach(img => {
+            const previewEl = document.getElementById(img.preview);
+            const hiddenEl = document.getElementById(img.hidden);
+            
+            // แสดงรูปเดิม ถ้าไม่มีให้ใช้รูป Placeholder
+            if (previewEl) previewEl.src = img.data || 'https://via.placeholder.com/150';
+            // เก็บค่า Base64 เดิมไว้ใน Hidden Input เพื่อไม่ให้หายตอนกดบันทึก
+            if (hiddenEl) hiddenEl.value = img.data || '';
+        });
+
     } else {
+        // --- โหมดเพิ่มใหม่ ---
         if (modalTitle) modalTitle.innerText = 'เพิ่มนักเรียนใหม่';
-        // ล้างรูปพรีวิวให้เป็นรูปว่าง
+        
+        // ล้างรูปพรีวิวและค่าใน Hidden Input ทั้งหมด
         for (let i = 1; i <= 3; i++) {
-            document.getElementById(`image-preview-${i}`).src = 'https://via.placeholder.com/150';
+            const previewEl = document.getElementById(`image-preview-${i}`);
+            if (previewEl) previewEl.src = 'https://via.placeholder.com/150';
+            
             const hiddenId = (i === 1) ? 'imagedatabase64' : `imagedatabase64-${i}`;
-            const hiddenInput = document.getElementById(hiddenId);
-            if (hiddenInput) hiddenInput.value = '';
+            const hiddenEl = document.getElementById(hiddenId);
+            if (hiddenEl) hiddenEl.value = '';
         }
     }
 
-    // 4. แสดง Modal (จุดสำคัญที่ทำให้หน้าต่างเด้งขึ้นมา)
+    // 4. แสดง Modal
     const modal = document.getElementById('student-modal');
     if (modal) {
         modal.classList.remove('hidden');
     } else {
-        console.error("หา ID student-modal ไม่เจอใน HTML");
+        console.error("ไม่สามารถเปิดหน้าต่างได้: หา ID 'student-modal' ไม่เจอ");
     }
 }
         function closeStudentModal() { 
@@ -2110,6 +2123,7 @@ async function deleteStudent(id, rowIndex) {
     </script>
 </body>
 </html>
+
 
 
 
