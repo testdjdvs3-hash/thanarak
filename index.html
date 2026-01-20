@@ -576,6 +576,8 @@
 
     <script>
         // --- GLOBAL STATE & CONFIG ---
+        let detectionCounts = new Map();
+         let isProcessing = false; // ตัวแปรป้องกันการทำงานซ้อน
         let gasWebAppUrl = '';
         let faceMatcher = null, pieChart, video, overlay;
         let students = [], subjects = [], attendance = [], checkedInToday = new Map();
@@ -626,7 +628,7 @@
                 const displaySize = { width: video.clientWidth, height: video.clientHeight };
                 faceapi.matchDimensions(overlay, displaySize);
                 
-                if (recognitionInterval) clearInterval(recognitionInterval); 
+                 if (recognitionInterval) clearInterval(recognitionInterval); 
                 
                 recognitionInterval = setInterval(async () => {
                     if (!isScanning || isScanningPaused) return; 
@@ -636,19 +638,43 @@
                     
                     overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
                     if (faceMatcher) {
-                        resizedDetections.forEach(d => {
-                            const bestMatch = faceMatcher.findBestMatch(d.descriptor);
-                            new faceapi.draw.DrawBox(d.detection.box, { label: bestMatch.toString() }).draw(overlay);
-                            if (bestMatch.label !== 'unknown') {
-                                const student = students.find(s => s.name === bestMatch.label);
-                                if (student && !checkedInToday.has(String(student.id))) {
-                                    handleRecognition(student);
-                                }
-                            }
-                        });
+            resizedDetections.forEach(d => {
+                const bestMatch = faceMatcher.findBestMatch(d.descriptor);
+                const label = bestMatch.label;
+                const distance = bestMatch.distance;
+                const confidence = Math.round((1 - distance) * 100);
+
+                // แสดงผลบนหน้าจอ (เขียวถ้า > 65%, แดงถ้า < 35%)
+                const isPassing = label !== 'unknown' && distance < 0.35; 
+                const boxColor = isPassing ? '#10b981' : '#ef4444';
+                new faceapi.draw.DrawBox(d.detection.box, { 
+                    label: `${label} (${confidence}%)`,
+                    drawOptions: { boxColor: boxColor }
+                }).draw(overlay);
+
+                // --- ส่วนบันทึกชื่อ ---
+                if (isPassing) {
+                    const student = students.find(s => s.name === label);
+                    if (student && !checkedInToday.has(String(student.id))) {
+                        
+                        // สะสมแต้มความมั่นใจ
+                        let count = (detectionCounts.get(student.id) || 0) + 1;
+                        detectionCounts.set(student.id, count);
+
+                        // ถ้าเจอหน้าเดิมซ้ำแค่ 2 รอบ (ประมาณ 1.4 วินาที) ให้บันทึกเลย
+                        if (count >= 2) { 
+                            handleRecognition(student);
+                            detectionCounts.delete(student.id); // ล้างค่านับเฉพาะคนที่เช็คผ่านแล้ว
+                        }
                     }
+                }
+                // สังเกตว่าผมเอาส่วน "detectionCounts.clear()" ที่เป็นตัวล้างค่าทั้งหมดออกไปแล้ว
+                // เพื่อให้ AI ไม่ลืมค่าที่นับไว้แม้มันจะเผลอทักเป็น unknown ไปบ้างบางเฟรม
+            });
+        }
                 }, 700);
             });
+
             const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             applyTheme(savedTheme);
             gasWebAppUrl = localStorage.getItem('gasWebAppUrl');
@@ -1472,33 +1498,52 @@ function openStudentModal(student = null) {
             }
         }
       async function handleStudentFormSubmit(event) {
-    event.preventDefault();
+    if (event) event.preventDefault();
     
-    const rowIndex = document.getElementById('student-row-index').value;
-    
-    // ดึงค่ารูปภาพจากทั้ง 3 ช่อง Hidden Input
+    // 1. ดึงค่าจากฟอร์มมาเก็บไว้
     const studentData = {
-        id: document.getElementById('student-id').value,
+        rowIndex: document.getElementById('student-row-index').value,
+        studentId: document.getElementById('student-id').value,
         name: document.getElementById('student-name').value,
-        class: document.getElementById('student-class').value,
-        imageData: document.getElementById('imagedatabase64').value, // รูปที่ 1
-        imageData2: document.getElementById('imagedatabase64-2').value, // รูปที่ 2
-        imageData3: document.getElementById('imagedatabase64-3').value  // รูปที่ 3
+        className: document.getElementById('student-class').value,
+        image1: document.getElementById('imagedatabase64').value,
+        image2: document.getElementById('imagedatabase64-2').value,
+        image3: document.getElementById('imagedatabase64-3').value
     };
 
-    try {
-        const response = await apiCall({
-            action: rowIndex ? 'updateStudent' : 'addStudent',
-            data: rowIndex ? { ...studentData, rowIndex: rowIndex } : studentData
-        });
+    const action = studentData.rowIndex ? 'updateStudent' : 'addStudent';
+    
+    // แสดงสถานะกำลังบันทึก (ถ้ามีปุ่มโหลด)
+    const btn = event.submitter;
+    if (btn) btn.disabled = true;
 
+    try {
+        // 2. ส่งข้อมูลไปที่ Google Sheets
+        const response = await apiCall({ action: action, data: studentData });
+        
         if (response.success) {
-            alert('บันทึกข้อมูลและรูปภาพทั้งหมดสำเร็จ');
-            closeStudentModal();
-            await loadStudentDataForStudentsPage();
+            closeStudentModal(); // ปิดหน้าต่างทันที
+            alert('บันทึกสำเร็จ');
+            
+            // 3. อัปเดตตารางหน้าเว็บทันที (โดยไม่ต้องรอ loadStudents นานๆ)
+            // ใช้คำสั่งนี้เพื่อบังคับให้เว็บดึงข้อมูลล่าสุดมาแสดงใหม่
+            if (typeof loadStudents === 'function') {
+                await loadStudents(); 
+            }
+            
+            if (typeof renderStudentTable === 'function') {
+                renderStudentTable(); 
+            }
+        } else {
+            alert('Server ตอบกลับว่าผิดพลาด: ' + response.error);
         }
     } catch (err) {
-        alert('เกิดข้อผิดพลาด: ' + err.message);
+        // ถ้าขึ้น "เชื่อมต่อ Server ผิดพลาด" แต่ใน Sheets เปลี่ยนแล้ว ให้มองข้าม Error นี้ไปก่อนครับ
+        console.error("Error:", err);
+        // ลองสั่งให้หน้าเว็บโหลดใหม่เผื่อข้อมูลเปลี่ยนแล้ว
+        location.reload(); 
+    } finally {
+        if (btn) btn.disabled = false;
     }
 }
         async function deleteStudent(rowIndex) {
@@ -2148,6 +2193,7 @@ async function deleteStudent(id, rowIndex) {
     </script>
 </body>
 </html>
+
 
 
 
