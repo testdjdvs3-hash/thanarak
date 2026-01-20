@@ -11,6 +11,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <style>
+        input[type="text"], input[type="number"], select {
+    color: #ffffff !important; /* เปลี่ยนเป็นสีขาวเพื่อให้ตัดกับพื้นหลังเข้ม */
+    background-color: #374151 !important; /* สีเทาเข้ม (bg-gray-700) */
+}
+
+/* หากเป็นโหมดสว่างหรือต้องการสีดำ */
+.light-mode input[type="text"] {
+    color: #000000 !important;
+}
        body { font-family: 'Inter', 'Kanit', sans-serif; }
         .loader { border-top-color: #3b82f6; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -57,7 +66,7 @@
                         <i data-lucide="bar-chart-3" class="w-4 h-4 mr-1.5"></i>สรุปผล
                     </button>
                     <a href="YOUR_URL_HERE" target="_blank" rel="noopener noreferrer" 
-                        class="flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-emerald-700 dark:text-emerald-200 hover:bg-emerald-200 dark:hover:bg-emerald-700 transition-colors duration-200">
+                       class="hidden flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-emerald-700 dark:text-emerald-200 hover:bg-emerald-200 dark:hover:bg-emerald-700 transition-colors duration-200">
                         <i data-lucide="external-link" class="w-4 h-4 mr-1.5"></i>ยังคิดไม่ออกว่าจะใส่อะไร
                     </a>
                 </nav>
@@ -2164,6 +2173,7 @@ async function deleteStudent(id, rowIndex) {
     </script>
 </body>
 </html>
+
 
 
 
