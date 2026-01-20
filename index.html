@@ -11,15 +11,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <style>
+                /* บังคับให้ตัวหนังสือในช่อง Input ทุกตัวใน Modal เป็นสีที่มองเห็นชัด */
         input[type="text"], input[type="number"], select {
-    color: #ffffff !important; /* เปลี่ยนเป็นสีขาวเพื่อให้ตัดกับพื้นหลังเข้ม */
-    background-color: #374151 !important; /* สีเทาเข้ม (bg-gray-700) */
-}
-
-/* หากเป็นโหมดสว่างหรือต้องการสีดำ */
-.light-mode input[type="text"] {
-    color: #000000 !important;
-}
+            color: #ffffff !important; /* เปลี่ยนเป็นสีขาวเพื่อให้ตัดกับพื้นหลังเข้ม */
+            background-color: #374151 !important; /* สีเทาเข้ม (bg-gray-700) */
+        }
+        /* หากเป็นโหมดสว่างหรือต้องการสีดำ */
+        .light-mode input[type="text"] {
+            color: #000000 !important;
+        }
        body { font-family: 'Inter', 'Kanit', sans-serif; }
         .loader { border-top-color: #3b82f6; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -65,8 +65,8 @@
                     <button onclick="switchTab('summary')" id="tab-summary" class="flex items-center px-3 py-1.5 text-sm font-medium rounded-md">
                         <i data-lucide="bar-chart-3" class="w-4 h-4 mr-1.5"></i>สรุปผล
                     </button>
-                    <a href="YOUR_URL_HERE" target="_blank" rel="noopener noreferrer" 
-                       class="hidden flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-emerald-700 dark:text-emerald-200 hover:bg-emerald-200 dark:hover:bg-emerald-700 transition-colors duration-200">
+                        <a href="YOUR_URL_HERE" target="_blank" rel="noopener noreferrer" 
+                           class="hidden flex items-center px-3 py-1.5 text-sm font-medium rounded-md text-emerald-700 dark:text-emerald-200 hover:bg-emerald-200 dark:hover:bg-emerald-700 transition-colors duration-200">
                         <i data-lucide="external-link" class="w-4 h-4 mr-1.5"></i>ยังคิดไม่ออกว่าจะใส่อะไร
                     </a>
                 </nav>
@@ -573,11 +573,9 @@
         </div>
     </div>
 
-    
+
     <script>
         // --- GLOBAL STATE & CONFIG ---
-        let detectionCounts = new Map();
-        let isProcessing = false; // ตัวแปรป้องกันการทำงานซ้อน
         let gasWebAppUrl = '';
         let faceMatcher = null, pieChart, video, overlay;
         let students = [], subjects = [], attendance = [], checkedInToday = new Map();
@@ -638,40 +636,17 @@
                     
                     overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
                     if (faceMatcher) {
-            resizedDetections.forEach(d => {
-                const bestMatch = faceMatcher.findBestMatch(d.descriptor);
-                const label = bestMatch.label;
-                const distance = bestMatch.distance;
-                const confidence = Math.round((1 - distance) * 100);
-
-                // แสดงผลบนหน้าจอ (เขียวถ้า > 65%, แดงถ้า < 35%)
-                const isPassing = label !== 'unknown' && distance < 0.35; 
-                const boxColor = isPassing ? '#10b981' : '#ef4444';
-                new faceapi.draw.DrawBox(d.detection.box, { 
-                    label: `${label} (${confidence}%)`,
-                    drawOptions: { boxColor: boxColor }
-                }).draw(overlay);
-
-                // --- ส่วนบันทึกชื่อ ---
-                if (isPassing) {
-                    const student = students.find(s => s.name === label);
-                    if (student && !checkedInToday.has(String(student.id))) {
-                        
-                        // สะสมแต้มความมั่นใจ
-                        let count = (detectionCounts.get(student.id) || 0) + 1;
-                        detectionCounts.set(student.id, count);
-
-                        // ถ้าเจอหน้าเดิมซ้ำแค่ 2 รอบ (ประมาณ 1.4 วินาที) ให้บันทึกเลย
-                        if (count >= 2) { 
-                            handleRecognition(student);
-                            detectionCounts.delete(student.id); // ล้างค่านับเฉพาะคนที่เช็คผ่านแล้ว
-                        }
+                        resizedDetections.forEach(d => {
+                            const bestMatch = faceMatcher.findBestMatch(d.descriptor);
+                            new faceapi.draw.DrawBox(d.detection.box, { label: bestMatch.toString() }).draw(overlay);
+                            if (bestMatch.label !== 'unknown') {
+                                const student = students.find(s => s.name === bestMatch.label);
+                                if (student && !checkedInToday.has(String(student.id))) {
+                                    handleRecognition(student);
+                                }
+                            }
+                        });
                     }
-                }
-                // สังเกตว่าผมเอาส่วน "detectionCounts.clear()" ที่เป็นตัวล้างค่าทั้งหมดออกไปแล้ว
-                // เพื่อให้ AI ไม่ลืมค่าที่นับไว้แม้มันจะเผลอทักเป็น unknown ไปบ้างบางเฟรม
-            });
-        }
                 }, 700);
             });
             const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -2159,7 +2134,7 @@ async function deleteStudent(id, rowIndex) {
         document.getElementById('image-upload-input-subject').addEventListener('change', function(e) {
         const file = e.target.files[0];
         if (file) {
-            const reader = new FileReader();
+            const reader = new FiฟleReader();
             reader.onload = function(event) {
                 const base64String = event.target.result;
                 // 1. โชว์รูปตัวอย่างในหน้าจอ
@@ -2173,8 +2148,6 @@ async function deleteStudent(id, rowIndex) {
     </script>
 </body>
 </html>
-
-
 
 
 
