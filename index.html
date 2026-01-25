@@ -615,7 +615,31 @@
             localStorage.setItem('theme', newTheme);
             applyTheme(newTheme);
         }
-
+        // --- ส่วนจัดการอัปโหลดรูปภาพรายวิชา ---
+document.getElementById('image-upload-input-subject').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            const base64String = event.target.result;
+            
+            // 1. แสดงรูปตัวอย่าง (ต้องมี <img> ที่ id="image-preview-subject")
+            const preview = document.getElementById('image-preview-subject');
+            if(preview) preview.src = base64String;
+            
+            // 2. เก็บค่า Base64 ลงในตัวแปรซ่อน (ต้องมี <input type="hidden" id="subject-image-data">)
+            const hiddenInput = document.getElementById('subject-image-data');
+            if(hiddenInput) {
+                hiddenInput.value = base64String;
+                console.log("✅ บันทึกรหัสรูปภาพลงในตัวแปรเตรียมส่งแล้ว");
+            } else {
+                console.error("❌ หาช่องรับข้อมูล ID 'subject-image-data' ไม่เจอ");
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+});
+        
         // --- INITIALIZATION ---
         window.onload = async () => {
             lucide.createIcons();
@@ -2193,6 +2217,7 @@ async function deleteStudent(id, rowIndex) {
     </script>
 </body>
 </html>
+
 
 
 
